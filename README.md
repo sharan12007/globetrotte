@@ -20,3 +20,4 @@ View your app in AI Studio: https://ai.studio/apps/drive/1TgnGDouztfzGy2eg7Ls5NU
    `npm run dev`
 # globetrotte
 # Odoo_hackathon
+# Odoo_hackathon
