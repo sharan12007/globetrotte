@@ -32,19 +32,15 @@ const callWithRetry = async (fn: () => Promise<any>, retries = 3, delay = 1500):
   } catch (error: any) {
     const errorMsg = error?.message || "";
     const isQuotaError = errorMsg.includes('429') || error?.status === 429 || errorMsg.includes('RESOURCE_EXHAUSTED');
-    const isNotFoundError = errorMsg.includes("Requested entity was not found");
     
-    if ((isQuotaError || isNotFoundError) && retries > 0) {
-      console.warn(`API issue detected. Retrying in ${delay}ms... (${retries} attempts left)`);
-      await new Promise(resolve => setTimeout(resolve, delay));
-      return callWithRetry(fn, retries - 1, delay * 2);
-    }
-    
+    // If it's a 429, don't retry! The daily limit is hit.
     if (isQuotaError) {
       throw new Error("STUDIO_QUOTA_EXCEEDED");
     }
-    if (isNotFoundError) {
-      throw new Error("API_KEY_INVALID");
+    
+    if (retries > 0) {
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return callWithRetry(fn, retries - 1, delay * 2);
     }
     throw error;
   }
@@ -87,7 +83,7 @@ export const suggestActivities = async (city: string, budget: string) => {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: `Act as a local destination guide for "${city}". Suggest 4 diverse activities that fit a "${budget}" budget level. 
-      Include the activity name, a category (e.g., Sightseeing, Food, Adventure), a brief description, the estimated cost in USD (numeric), and typical duration.`,
+      Include the activity name, a category (e.g., Sightseeing, Food, Adventure), a brief description, the estimated cost in INR (numeric), and typical duration.`,
       config: {
         responseMimeType: "application/json",
         responseSchema: {
@@ -115,7 +111,7 @@ export const getBudgetInsight = async (itinerarySummary: string) => {
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: `Analyze this itinerary and provide a professional financial health check: ${itinerarySummary}. 
+      contents: `Analyze this itinerary in Indian Rupees (INR) and provide a professional financial health check: ${itinerarySummary}. 
       Assess if the budget is realistic for these locations and activities. Provide 3 specific cost-saving tips and 1 high-value recommendation.`,
       config: {}
     });

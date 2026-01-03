@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Search, Filter, LayoutGrid, MapPin, Sparkles, Loader2, Plus, ArrowRight, DollarSign, Clock, HelpCircle, ChevronDown, AlertCircle, Key } from 'lucide-react';
+import { Search, Filter, MapPin, Sparkles, Loader2, ArrowRight, DollarSign, HelpCircle, AlertCircle } from 'lucide-react';
 import { searchCities, suggestActivities } from '../services/geminiService';
-
+import { getPlaceImage } from '../lib/format';
 const Explore: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -50,22 +49,6 @@ const Explore: React.FC = () => {
     }
   }, []);
 
-  const handleOpenKeyDialog = async () => {
-    try {
-      // @ts-ignore
-      if (window.aistudio && typeof window.aistudio.openSelectKey === 'function') {
-        // @ts-ignore
-        await window.aistudio.openSelectKey();
-        // Assuming key selection was successful, retry search
-        if (query) handleSearch(query);
-      } else {
-        alert("Platform key selection not available in this context.");
-      }
-    } catch (err) {
-      console.error("Failed to open key dialog:", err);
-    }
-  };
-
   useEffect(() => {
     if (initialQuery) {
       handleSearch(initialQuery);
@@ -111,9 +94,6 @@ const Explore: React.FC = () => {
           </form>
 
           <div className="flex items-stretch gap-3">
-             <button onClick={handleOpenKeyDialog} className="flex items-center gap-3 px-8 py-5 bg-[#0f172a]/60 border border-white/5 rounded-[20px] text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
-               <Key className="w-4 h-4" /> Change Key
-             </button>
              <button className="flex items-center gap-3 px-8 py-5 bg-[#0f172a]/60 border border-white/5 rounded-[20px] text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
                <Filter className="w-4 h-4" /> Filter
              </button>
@@ -148,14 +128,8 @@ const Explore: React.FC = () => {
                     : "The provided API key is invalid or not found."}
                 </p>
                 <div className="flex flex-col items-center gap-6 mt-10">
-                  <button 
-                    onClick={handleOpenKeyDialog}
-                    className="bg-blue-600 hover:bg-blue-500 text-white px-10 py-5 rounded-[24px] text-[11px] font-black uppercase tracking-[0.3em] shadow-2xl transition-all"
-                  >
-                    Select New Paid API Key
-                  </button>
-                  <p className="text-[9px] text-slate-600 font-black uppercase tracking-widest max-w-xs">
-                    Please use a key from a paid GCP project to ensure consistent service.
+                  <p className="text-[11px] text-slate-500 font-black uppercase tracking-widest max-w-xs leading-relaxed">
+                    Update your <code className="text-blue-400">GEMINI_API_KEY</code> in the <code className="text-blue-400">.env.local</code> file and restart the development server.
                   </p>
                 </div>
               </div>
@@ -170,7 +144,7 @@ const Explore: React.FC = () => {
                 <div className="flex items-center gap-10">
                   <div className="relative w-48 h-32 rounded-3xl overflow-hidden shrink-0 shadow-2xl border border-white/5">
                     <img 
-                      src={`https://picsum.photos/seed/${res.name}/400/300`} 
+                    src={getPlaceImage(res.name, res.country || "")}
                       alt={res.name} 
                       className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-1000"
                     />
@@ -202,7 +176,7 @@ const Explore: React.FC = () => {
                     <div className="flex flex-col">
                       <span className="text-[8px] font-black text-slate-700 uppercase tracking-widest mb-1">Cost Index</span>
                       <div className="flex items-center gap-1 text-white">
-                         <DollarSign className="w-4 h-4 text-emerald-500" />
+                                 <span className="text-xl font-bold text-emerald-500 mr-1">₹</span>
                          <span className="text-2xl font-black tracking-tight">{res.costIndex || res.cost || '??'}</span>
                       </div>
                     </div>

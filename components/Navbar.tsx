@@ -12,7 +12,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
   const navigate = useNavigate();
 
   return (
-    <nav className="sticky top-0 z-[100] px-4 py-4 pointer-events-none">
+    <nav className="sticky top-0 z-[100] px-4 py-4 pointer-events-none no-print">
       {/* 
           FIXES: 
           - Changed 'container mx-auto' to 'w-full max-w-7xl mx-auto' for smoother scaling

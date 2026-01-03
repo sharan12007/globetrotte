@@ -1,6 +1,8 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { formatINR } from '../lib/format';
+import { getPlaceImage } from '../lib/format';
 import { 
   Plus, 
   Search, 
@@ -26,13 +28,39 @@ const Dashboard: React.FC<DashboardProps> = ({ trips, user }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const upcomingTrips = trips.filter(t => t.status === 'upcoming' || t.status === 'planning');
 
-  const regions = [
-    { name: 'Kyoto', country: 'Japan', img: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800&auto=format&fit=crop', tag: 'Cultural' },
-    { name: 'Santorini', country: 'Greece', img: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?q=80&w=800&auto=format&fit=crop', tag: 'Romance' },
-    { name: 'Swiss Alps', country: 'Switzerland', img: 'https://images.unsplash.com/photo-1531310197839-ccf54634509e?q=80&w=800&auto=format&fit=crop', tag: 'Adventure' },
-    { name: 'Bali', country: 'Indonesia', img: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?q=80&w=800&auto=format&fit=crop', tag: 'Relaxation' },
-    { name: 'Lisbon', country: 'Portugal', img: 'https://images.unsplash.com/photo-1585211777151-fd36912765b0?q=80&w=800&auto=format&fit=crop', tag: 'Architecture' },
-  ];
+// Inside Dashboard.tsx
+const regions = [
+  { 
+    name: 'Kyoto', 
+    country: 'Japan', 
+    img: getPlaceImage('Kyoto', 'Japan'), 
+    tag: 'Cultural' 
+  },
+  { 
+    name: 'Santorini', 
+    country: 'Greece', 
+    img: getPlaceImage('Santorini', 'Greece'), 
+    tag: 'Romance' 
+  },
+  { 
+    name: 'Swiss Alps', 
+    country: 'Switzerland', 
+    img: getPlaceImage('Swiss Alps', 'mountains'), 
+    tag: 'Adventure' 
+  },
+  { 
+    name: 'Bali', 
+    country: 'Indonesia', 
+    img: getPlaceImage('Bali', 'temple'), 
+    tag: 'Relaxation' 
+  },
+  { 
+    name: 'Lisbon', 
+    country: 'Portugal', 
+    img: getPlaceImage('Lisbon', 'Portugal'), 
+    tag: 'Architecture' 
+  },
+];
 
   const handleQuickSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -167,8 +195,8 @@ const Dashboard: React.FC<DashboardProps> = ({ trips, user }) => {
                 className="group glass p-6 rounded-[48px] border border-white/5 hover:border-blue-500/30 transition-all duration-500 card-glow"
               >
                 <div className="relative h-60 rounded-[32px] overflow-hidden mb-8">
-                  <img 
-                    src={trip.coverImage || `https://picsum.photos/seed/${trip.id}/800/600`} 
+                  <img
+                  src={trip.coverImage || getPlaceImage(trip.stops[0]?.city || "travel", trip.stops[0]?.country)}
                     alt={trip.name} 
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-80" 
                   />
@@ -204,7 +232,7 @@ const Dashboard: React.FC<DashboardProps> = ({ trips, user }) => {
                     </div>
                     <div className="text-right">
                       <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Budget index</p>
-                      <p className="text-base font-black text-white">${trip.totalBudget.toLocaleString()}</p>
+                      <p className="text-base font-black text-white">₹{formatINR(trip.totalBudget)}</p>
                     </div>
                   </div>
                 </div>

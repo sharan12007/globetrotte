@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import ReactFlow, { 
@@ -30,7 +29,7 @@ interface TripBuilderProps {
 
 const TripBuilderContent: React.FC<TripBuilderProps> = ({ user, trips = [], onSave }) => {
   const { id } = useParams();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const isEditing = !!id;
   const initialLoadRef = useRef(false);
@@ -249,6 +248,9 @@ const TripBuilderContent: React.FC<TripBuilderProps> = ({ user, trips = [], onSa
     setSearchQuery('');
   }, [createNodeData, setNodes, setEdges, autoConnect, getDayForIndex]);
 
+  /**
+   * Logic to handle Loading an Existing Trip (Editing)
+   */
   useEffect(() => {
     if (isEditing && trips.length > 0 && !initialLoadRef.current) {
       const trip = trips.find(t => t.id === id);
@@ -283,6 +285,39 @@ const TripBuilderContent: React.FC<TripBuilderProps> = ({ user, trips = [], onSa
       }
     }
   }, [id, isEditing, trips, createNodeData, setNodes, setEdges]);
+
+  /**
+   * Logic to handle "Launch Expedition" from the Explore page (Auto-Add Node)
+   */
+  useEffect(() => {
+    const queryParam = searchParams.get('q');
+    
+    // If there is a query, we aren't editing a trip, and we haven't processed this load yet
+    if (queryParam && !isEditing && !initialLoadRef.current) {
+      initialLoadRef.current = true;
+      setName(`Expedition to ${queryParam}`);
+      
+      const autoInitialize = async () => {
+        setIsSearching(true);
+        try {
+          const results = await searchCities(queryParam);
+          if (results && results.length > 0) {
+            // Find the exact match or take the first AI suggestion
+            const match = results.find(r => r.name.toLowerCase() === queryParam.toLowerCase()) || results[0];
+            addCityToFlow(match);
+          }
+        } catch (err) {
+          console.error("Auto-initialization failed:", err);
+        } finally {
+          setIsSearching(false);
+          // Remove the query param from URL so refresh doesn't duplicate nodes
+          setSearchParams({});
+        }
+      };
+
+      autoInitialize();
+    }
+  }, [searchParams, isEditing, addCityToFlow, setSearchParams]);
 
   const onConnect = useCallback((params: Connection) => setEdges((eds) => addEdge({ ...params, animated: true, markerEnd: { type: MarkerType.ArrowClosed, color: '#3b82f6' } }, eds)), [setEdges]);
 
@@ -327,7 +362,6 @@ const TripBuilderContent: React.FC<TripBuilderProps> = ({ user, trips = [], onSa
         return;
       }
 
-      // Automatically derive aggregate start/end dates if not manually set in the header
       let finalStart = startDate;
       let finalEnd = endDate;
       

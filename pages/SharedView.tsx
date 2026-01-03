@@ -3,7 +3,7 @@ import React from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Globe, ArrowRight, MapPin, Calendar, Clock, ChevronLeft } from 'lucide-react';
 import { Trip } from '../types';
-
+import { getPlaceImage } from '../lib/format';
 interface SharedViewProps {
   trips: Trip[];
 }
@@ -114,7 +114,8 @@ const SharedView: React.FC<SharedViewProps> = ({ trips }) => {
             {trip.stops.map((stop, i) => (
               <div key={stop.id} className="glass p-8 rounded-[40px] border border-white/5 flex gap-10 items-center">
                 <div className="w-40 h-28 rounded-3xl overflow-hidden shrink-0 border border-white/5 bg-slate-900">
-                  <img src={`https://picsum.photos/seed/${stop.city}/400/300`} alt={stop.city} className="w-full h-full object-cover opacity-60" />
+                  <img src={getPlaceImage(stop.city, stop.country)}
+ alt={stop.city} className="w-full h-full object-cover opacity-60" />
                 </div>
                 <div className="flex-grow space-y-2">
                   <div className="flex items-center gap-3">

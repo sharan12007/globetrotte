@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Handle, Position } from 'reactflow';
+import { formatINR } from '../lib/format';
 import { 
   Calendar, 
   DollarSign, 
@@ -141,8 +142,8 @@ export const CityNode = ({ data }: any) => {
                 <div className="flex flex-col w-full">
                    <span className="text-[7px] font-black text-slate-700 uppercase tracking-widest">Section Budget</span>
                    <div className="flex items-center justify-between">
-                      <DollarSign className="w-3 h-3 text-emerald-500" />
-                      <span className="text-sm font-black text-white">${stopBudget.toLocaleString()}</span>
+                    <span className="text-emerald-500 font-bold mr-1">₹</span>
+                    <span className="text-sm font-black text-white">{formatINR(stopBudget)}</span>
                    </div>
                 </div>
              </div>
@@ -172,7 +173,7 @@ export const CityNode = ({ data }: any) => {
                     <div className="bg-slate-950/80 border border-white/5 rounded-2xl p-4 mb-3 space-y-3 animate-in fade-in slide-in-from-top-1">
                       <p className="text-[9px] text-slate-500 font-medium italic leading-relaxed">{act.description}</p>
                       <div className="flex items-center justify-between pt-2 border-t border-white/5">
-                        <span className="text-[8px] font-black text-emerald-400">${act.cost}</span>
+                        <span className="text-[8px] font-black text-emerald-400">₹{act.cost}</span>
                         {!isViewOnly && (
                           <button onClick={() => onActivityDelete(act.id)} className="text-red-900 hover:text-red-500 transition-colors">
                             <Trash2 className="w-3 h-3" />
