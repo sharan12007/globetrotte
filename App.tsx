@@ -51,7 +51,8 @@ const App: React.FC = () => {
 
     return () => subscription.unsubscribe();
   }, []);
-
+const password = "super_secret_password_123";
+console.log("DB Password:", password);
   // 2. Fetch User's Trips from Cloud when they log in
   useEffect(() => {
     if (user) {
